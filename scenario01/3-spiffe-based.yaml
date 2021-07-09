@@ -1,0 +1,14 @@
+# Allow pods running with the default service account to contact pods
+# running with the foo service account.
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "spiffe-based"
+spec:
+  endpointSelector:
+    matchLabels:
+      spiffe://example.org/ns/default/sa/default: ""
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        spiffe://example.org/ns/default/sa/foo: ""

@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: demo5
+automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: server
+  labels:
+    type: my-pod
+spec:
+  serviceAccountName: demo5
+  containers:
+  - name: server
+    image: python:latest
+    command: ["python3", "-m", "http.server", "80"] 
+  nodeName: k8s2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: server
+spec:
+  type: ClusterIP
+  ports:
+  - port: 443
+  selector:
+    type: my-pod

@@ -1,0 +1,22 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "tls-upgrade"
+spec:
+  endpointSelector:
+    matchLabels:
+      type: my-pod
+  egress:
+  - toPorts:
+    - ports:
+      - port: "80"
+        protocol: "TCP"
+      originatingTLS:
+        spiffe:
+          peerIDs:
+            - spiffe://example.org/server
+        dstPort: 8443
+          
+      rules:
+        http:
+        - {}

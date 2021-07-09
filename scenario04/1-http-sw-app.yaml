@@ -1,0 +1,87 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: starwars
+automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: deathstar
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    org: empire
+    class: deathstar
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deathstar
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      org: empire
+      class: deathstar
+  template:
+    metadata:
+      labels:
+        org: empire
+        class: deathstar
+    spec:
+      serviceAccountName: starwars
+      containers:
+      - name: deathstar
+        image: docker.io/cilium/starwars
+      nodeName: k8s2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: deathstar2
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    org: empire2
+    class: deathstar2
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deathstar2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      org: empire2
+      class: deathstar2
+  template:
+    metadata:
+      labels:
+        org: empire2
+        class: deathstar2
+    spec:
+      serviceAccountName: starwars
+      containers:
+      - name: deathstar2
+        image: docker.io/cilium/starwars
+      nodeName: k8s2
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: xwing
+  labels:
+    org: alliance
+    class: xwing
+spec:
+  serviceAccountName: starwars
+  containers:
+  - name: spaceship
+    image: docker.io/tgraf/netperf
+  nodeName: k8s1

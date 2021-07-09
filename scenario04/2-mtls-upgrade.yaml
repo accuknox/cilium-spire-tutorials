@@ -1,0 +1,79 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "tls-upgrade-xwing"
+spec:
+  endpointSelector:
+    matchLabels:
+      class: xwing
+  egress:
+  - toPorts:
+    - ports:
+      - port: "80"
+        protocol: "TCP"
+      originatingTLS:
+        spiffe:
+          peerIDs:
+            - spiffe://example.org/deathstar
+            - spiffe://example.org/deathstar2
+      rules:
+        http:
+        - {}
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "tls-upgrade-deathstar"
+spec:
+  endpointSelector:
+    matchLabels:
+      class: deathstar
+  ingress:
+  - toPorts:
+    - ports:
+      - port: "80"
+        protocol: "TCP"
+      terminatingTLS:
+        spiffe:
+          peerIDs:
+            - spiffe://example.org/xwing
+      rules:
+        http:
+        - {}
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "tls-upgrade-deathstar2"
+spec:
+  endpointSelector:
+    matchLabels:
+      class: deathstar2
+  ingress:
+  - toPorts:
+    - ports:
+      - port: "80"
+        protocol: "TCP"
+      terminatingTLS:
+        spiffe:
+          peerIDs:
+            - spiffe://example.org/xwing
+      rules:
+        http:
+        - {}
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "enable-xwing-dns"
+spec:
+  description: "Enable DNS traffic for xwing"
+  endpointSelector:
+    matchLabels:
+     org: alliance
+     class: xwing
+  egress:
+    - toPorts:
+      - ports:
+        - port: "53"
+          protocol: UDP 
