@@ -15,7 +15,7 @@ spec:
   - name: poddefault
     image: praqma/network-multitool
     command: ["bin/sh", "-c", "sleep 10000"] 
-  nodeName: k8s1
+      #  nodeName: k8s1
 --- 
 apiVersion: v1
 kind: Pod
@@ -29,4 +29,4 @@ spec:
   - name: podfoo
     image: praqma/network-multitool
     command: ["bin/sh", "-c", "sleep 10000"] 
-  nodeName: k8s2
+      #nodeName: k8s2
