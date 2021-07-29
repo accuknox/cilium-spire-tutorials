@@ -36,7 +36,7 @@ spec:
       containers:
       - name: deathstar
         image: docker.io/cilium/starwars
-      nodeName: k8s2
+      # nodeName: k8s2
 ---
 apiVersion: v1
 kind: Pod
@@ -50,4 +50,4 @@ spec:
   containers:
   - name: spaceship
     image: docker.io/tgraf/netperf
-  nodeName: k8s1
+  # nodeName: k8s1
