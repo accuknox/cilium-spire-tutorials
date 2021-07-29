@@ -1,4 +1,4 @@
-This tutorial shows some scenarios related to the Cilium and Spire integration.
+This tutorial shows some scenarios related to the Cilium and Spire integration. This integration modifies the following components: cilium-agent, cilium-envoy and spire-agent.
 The image below represents the summary of the actions performed in each of them.
 
 <img src="imgs/background.png" alt="drawing" width="800"/>
@@ -18,13 +18,13 @@ minikube start --network-plugin=cni --memory=4096
 minikube ssh -- sudo mount bpffs -t bpf /sys/fs/bpf
 ```
 
-Deploy manifest (cilium + spire + dependencies):
+Deploy manifest (cilium-control-plane + spire-control-plane + dependencies):
 
 ```
 kubectl apply -f cilium-spire.yaml
 ```
 
-Check pods status:
+Check the status of the all the pods.  The spire-control-plane (spire-agent and spire-server) should be Running as well as the cilium-control-plane.
 
 ```
 kubectl get pods -A
@@ -44,7 +44,7 @@ spire         spire-agent-648qt                  1/1     Running   0          47
 spire         spire-server-0                     1/1     Running   1          23h
 ```
 
-
+After setting the Cilium and Spire integration, follow some scenarios exposed by the next tutorials. All the files related to which scenarios is inside the folder.
 ## Tutorials
 
 - [Scenario 1: L3/L4 policies based on SPIFFE ID](scenario01/README.md)  
