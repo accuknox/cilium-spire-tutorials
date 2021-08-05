@@ -12,13 +12,13 @@ Description of the scenario: the goal of the scenario exposed by the image below
 Create registration entries in Spire. The registration entries contains the SPIFFE ID based on a set of selectors, which is going to be assigned to the pods. Run the follow to create all registration entries for this tutorial after 
 
 ```
-% ./0-create-entries.sh
+./0-create-entries.sh
 ```
 
 Deploy pods `poddefault` and `podfoo`. The former is deployed on namespace `default`. The other one is deployed on namespace `foo`.
 
 ```
-% kubectl apply -f 1-http-sw-app.yaml
+kubectl apply -f 1-http-sw-app.yaml
 ```
 
 Check if the SPIFFE ID was assigned to `poddefault` and `podfoo` pods. The pod `poddefault` must have a new label called `spiffe://example.org/ns/default/sa/default` and the pod `podfoo` a new label called `spiffe://example.org/ns/default/sa/foo`.
@@ -60,13 +60,27 @@ ENDPOINT   POLICY (ingress)   POLICY (egress)   IDENTITY   LABELS (source:key[=v
 Do the connectivity test between them before apply a CNP - it should worked. Now, lets deny all the  communication only between them: 
 
 ```
-% kubectl apply -f 2-deny-all.yaml
+kubectl apply -f 2-deny-all.yaml
+```
+
+The deny all policy is showed below:
+
+```
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "deny-all-egress"
+spec:
+  endpointSelector:
+    {}
+  egress:
+  - {}
 ```
 
 Check the if the communication will be blocked between the endpoints:
 
 ```
-% kubectl exec poddefault -- ping <ip-podfoo>
+kubectl exec poddefault -- ping <ip-podfoo>
 ```
 
 > The podfoo IP address is found using the command `kubectl get pods poddefault -o wide`
@@ -100,7 +114,8 @@ kubectl apply -f 3-spiffe-based.yaml
 Lets check the if the communication is allowed between the endpoints using this new policy:
 
 ```
-% kubectl exec poddefault -- ping <ip-podfoo>
+kubectl exec poddefault -- ping <ip-podfoo>
+
 PING 10.0.0.84 (10.0.0.84) 56(84) bytes of data.
 64 bytes from 10.0.0.84: icmp_seq=1 ttl=64 time=0.059 ms
 64 bytes from 10.0.0.84: icmp_seq=2 ttl=64 time=0.054 ms
@@ -109,10 +124,12 @@ PING 10.0.0.84 (10.0.0.84) 56(84) bytes of data.
 Great! The policy enforcement based on SPIFFE ID label is working.
 If the connectivity is performed to outside (8.8.8.8), it should not be allowed.
 
-% kubectl exec poddefault -- ping 8.8.8.8
+```
+kubectl exec poddefault -- ping 8.8.8.8
+```
 
 To clean up the pods and CNPs:
 
 ```
-% ./4-clean-all.sh
+./4-clean-all.sh
 ```
