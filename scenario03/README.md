@@ -12,19 +12,19 @@ Note: for simplicity, in this tutorial, the upgrade happens just for HTTP connec
 Create spire registration entries:
 
 ```
-% ./0-create_registration_entries.sh
+./0-create_registration_entries.sh
 ```
 
 Deploy Star Wars scenario (from Cilium tutorials):
 
 ```
-% kubectl apply -f 1-http-sw-app.yaml
+kubectl apply -f 1-http-sw-app.yaml
 ```
 
 Check if the SPIFFE ID was assigned in `xwing` and `deathstar` pods. The pod `xwing` must have a new label called `spiffe://example.org/xwing` and the pod `deathstar` a new label called `spiffe://example.org/deathstar`.
 
 ```
-% kubectl -n kube-system exec cilium-74m7n -- cilium endpoint list                                                                       
+kubectl -n kube-system exec cilium-74m7n -- cilium endpoint list
 Defaulted container "cilium-agent" out of: cilium-agent, mount-cgroup (init), clean-cilium-state (init)                                                                                       
 ENDPOINT   POLICY (ingress)   POLICY (egress)   IDENTITY   LABELS (source:key[=value])                                           IPv6       IPv4         STATUS                               
            ENFORCEMENT        ENFORCEMENT                                                                                                                                                     
@@ -125,13 +125,13 @@ spec:
 Apply Cilium Network Policies (CNP):
 
 ```
-% kubectl apply -f 2-mtls-upgrade.yaml
+kubectl apply -f 2-mtls-upgrade.yaml
 ```
 
 Check if the policies were enforced in `xwing` and `deathstar` endpoints. Just to remember, for pod `xwing` we apply a policy just for egress and for pod `deathstar`, just for ingress. Just keep it in mind when looking at the column `ENFORCEMENT`.
 
 ```
-% kubectl exec cilium-74m7n -- cilium endpoint list                                                                       
+kubectl exec cilium-74m7n -- cilium endpoint list
 Defaulted container "cilium-agent" out of: cilium-agent, mount-cgroup (init), clean-cilium-state (init)                                                                                       
 ENDPOINT   POLICY (ingress)   POLICY (egress)   IDENTITY   LABELS (source:key[=value])                                           IPv6       IPv4         STATUS                               
            ENFORCEMENT        ENFORCEMENT                                                                                                                                                     
