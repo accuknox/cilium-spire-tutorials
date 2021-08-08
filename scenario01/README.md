@@ -1,6 +1,6 @@
 ## Scenario 1: L3/L4 policies based on SPIFFE ID
 
-Description of the scenario: the goal of the scenario exposed by the image below is to do a connectivity test (icmp) between the pods `poddefault` and `podfoo`. A Cilium Network Policy (CNP) is going to be applied to allow the connectivity between both pods based on the SPIFFE ID label received by the pod. For this tutorial the following steps will be performed:
+Description of the scenario: The goal of the scenario is to do a connectivity test (icmp) between the pods `poddefault` and `podfoo`. A Cilium Network Policy (CNP) is going to be applied to allow the connectivity between both pods based on the SPIFFE ID label received by the pod. For this tutorial the following steps will be performed:
 
 1. Create all pods for this scenario;
 2. Do the connectivity test between them before apply a CNP. The connectivity test should worked normally;
@@ -80,10 +80,9 @@ spec:
 Check the if the communication will be blocked between the endpoints:
 
 ```
-kubectl exec poddefault -- ping <ip-podfoo>
+# ping ip address of podfoo
+kubectl exec poddefault -- ping $(kubectl get pods -o=jsonpath='{.items[?(@.metadata.name=="podfoo")].status.podIP}')
 ```
-
-> The podfoo IP address is found using the command `kubectl get pods poddefault -o wide`
 
 Lets allow the communication from `poddefault` to `podfoo`. Note the policy below is based on the SPIFFE ID that were assigned to each endpoint.
 
@@ -114,7 +113,8 @@ kubectl apply -f 3-spiffe-based.yaml
 Lets check the if the communication is allowed between the endpoints using this new policy:
 
 ```
-kubectl exec poddefault -- ping <ip-podfoo>
+# ping ip address of podfoo
+kubectl exec poddefault -- ping $(kubectl get pods -o=jsonpath='{.items[?(@.metadata.name=="podfoo")].status.podIP}')
 
 PING 10.0.0.84 (10.0.0.84) 56(84) bytes of data.
 64 bytes from 10.0.0.84: icmp_seq=1 ttl=64 time=0.059 ms
