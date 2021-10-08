@@ -21,7 +21,8 @@ minikube ssh -- sudo mount bpffs -t bpf /sys/fs/bpf
 Deploy manifest (cilium-control-plane + spire-control-plane + dependencies):
 
 ```
-kubectl apply -f cilium-spire.yaml
+kubectl apply -f cilium.yaml \
+              -f spire.yaml
 ```
 
 Check the status of the all the pods.  The spire-control-plane (spire-agent and spire-server) should be Running as well as the cilium-control-plane.
