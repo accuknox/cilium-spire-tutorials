@@ -1,0 +1,3 @@
+spireServerAddress: ""
+spireServerPort: ""
+# identityTemplate: ns/{{.Pod.Namespace}}/pod/{{.Pod.Name}}

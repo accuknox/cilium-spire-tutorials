@@ -1,0 +1,149 @@
+# Based on https://raw.githubusercontent.com/spiffe/spire/main/support/k8s/k8s-workload-registrar/mode-crd/config/spire-agent.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spire-agent
+  namespace: spire
+data:
+  agent.conf: |
+    agent {
+      data_dir = "/run/spire"
+      log_level = "DEBUG"
+      server_address = {{ .Values.spireServerAddress | quote }}
+      server_port = {{ .Values.spireServerPort | quote }}
+      socket_path = "/run/spire/sockets/agent.sock"
+      trust_domain = "example.org"
+      insecure_bootstrap = true
+      admin_socket_path = "/run/spire/sockets-admin/admin.sock"
+      authorized_users_delegation_api = [
+          "spiffe://example.org/ciliumagent",
+      ]
+    }
+
+    plugins {
+      NodeAttestor "k8s_psat" {
+        plugin_data {
+          cluster = "demo-cluster"
+        }
+      }
+
+      KeyManager "memory" {
+        plugin_data {
+        }
+      }
+
+      WorkloadAttestor "k8s" {
+        plugin_data {
+            # Defaults to the secure kubelet port by default.
+            # Minikube does not have a cert in the cluster CA bundle that
+            # can authenticate the kubelet cert, so skip validation.
+            skip_kubelet_verification = true
+        }
+      }
+
+      WorkloadAttestor "unix" {
+          plugin_data {
+          }
+      }
+    }
+
+---
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: spire-agent
+  namespace: spire
+  labels:
+    app: spire-agent
+spec:
+  selector:
+    matchLabels:
+      app: spire-agent
+  template:
+    metadata:
+      namespace: spire
+      labels:
+        app: spire-agent
+    spec:
+      hostPID: true
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      serviceAccountName: spire-agent
+      containers:
+        - name: spire-agent
+          image: docker.io/accuknox/spire-agent:identity-soln
+          args: ["-config", "/run/spire/config/agent.conf"]
+          volumeMounts:
+            - name: spire-config
+              mountPath: /run/spire/config
+              readOnly: true
+            - name: spire-agent-socket
+              mountPath: /run/spire/sockets
+              readOnly: false
+            - name: spire-bundle
+              mountPath: /run/spire/bundle
+            - name: spire-token
+              mountPath: /var/run/secrets/tokens
+            - name: spire-admin-agent-socket
+              mountPath: /run/spire/sockets-admin
+              readOnly: false
+          livenessProbe:
+            exec:      
+              command: ["/opt/spire/bin/spire-agent", "healthcheck", "-socketPath", "/run/spire/sockets/agent.sock"]
+            failureThreshold: 2
+            initialDelaySeconds: 15
+            periodSeconds: 60
+            timeoutSeconds: 3
+          readinessProbe:
+            exec:
+              command: ["/opt/spire/bin/spire-agent", "healthcheck", "-socketPath", "/run/spire/sockets/agent.sock", "--shallow"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: spire-config
+          configMap:
+            name: spire-agent
+        - name: spire-agent-socket
+          hostPath:
+            path: /run/spire/sockets
+            type: DirectoryOrCreate
+        - name: spire-bundle
+          configMap:
+            name: spire-bundle
+        - name: spire-admin-agent-socket
+          hostPath:
+            path: /run/spire/sockets-admin
+            type: DirectoryOrCreate
+        - name: spire-token
+          projected:
+           sources:
+           - serviceAccountToken:
+              path: spire-agent
+              expirationSeconds: 7200
+              audience: spire-server
+
+--- 
+# server persistent volume
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: my-pv-vol
+  labels:
+    type: local
+spec:
+  storageClassName: ""
+  capacity:
+    storage: 4Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/run"
+
+--- 
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spire-bundle
+  namespace: spire
