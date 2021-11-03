@@ -54,6 +54,7 @@ After setting the Cilium and Spire integration, follow some scenarios exposed by
 - [Scenario 3: Upgrading non-secure connections to mTLS](scenario03/README.md)  
 - [Scenario 4: Upgrading non-secure connections to mTLS with multiple peerIDs (client)](scenario04/)
 - [Scenario 5: Authorizing with non-k8s workload (Client)](scenario05/)  
+- [Scenario 6: Auto-generating Cilium label (SPIFFE ID) using SPIRE K8s Workload Registrar](scenario06/)  
 
 ## References
 
