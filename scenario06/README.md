@@ -1,6 +1,6 @@
 # Scenario 6: Auto-generating Cilium label (SPIFFE ID) using SPIRE K8s Workload Registrar
 
-Description of the scenario: the goal of the scenario exposed by the image below is to use the SPIRE [k8s-workload-registrar](https://github.com/spiffe/spire/tree/main/support/k8s/k8s-workload-registrar) component to automatically assign the SPIFFE ID to a workload (nginx) and verify that the ID was created as a k8s label in cilium. This label can be used for policy enforcement using the [Cilium Network Policies](https://docs.cilium.io/en/stable/concepts/kubernetes/policy/#ciliumnetworkpolicy) (CNPs). 
+Description of the scenario: the goal of the scenario exposed by the image below is to use the SPIRE [k8s-workload-registrar](https://github.com/spiffe/spire/tree/main/support/k8s/k8s-workload-registrar) component to automatically assign the SPIFFE ID to a workload (nginx) and verify that the ID was created as a k8s label in Cilium. This label can be used in [Cilium Network Policies](https://docs.cilium.io/en/stable/concepts/kubernetes/policy/#ciliumnetworkpolicy)(CNPs) for policy enforcement . 
 
 <img src="../imgs/scenario06.png" alt="drawing" width="800"/>
 
