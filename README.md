@@ -5,27 +5,41 @@ The image below represents the summary of the actions performed in each of them.
 
 ## First steps
 
-Download repository dependencies:
+#### 1) Download repository dependencies
 
 ```
 go vendor
 ```
 
-Create minikube cluster:
+#### 2) Create minikube cluster
 
 ```
 minikube start --network-plugin=cni --memory=4096
 minikube ssh -- sudo mount bpffs -t bpf /sys/fs/bpf
 ```
 
-Deploy manifest (cilium-control-plane + spire-control-plane + dependencies):
+#### 3) Deploy manifests
 
+For generic deployment,
 ```
 kubectl apply -f cilium.yaml \
               -f spire.yaml
 ```
 
-Check the status of the all the pods.  The spire-control-plane (spire-agent and spire-server) should be Running as well as the cilium-control-plane.
+For GKE,
+- Check the CIDR of your GKE cluster.
+```
+  gcloud container clusters describe <cluster-name> --zone <gcp-zone> --format 'value(clusterIpv4Cidr)'
+```
+- Edit `cilium-gke.yaml` file and change the value of `ipv4-native-routing-cidr` to match the CIDR of your GKE cluster.
+- Apply the manifests.
+```
+kubectl apply -f cilium-gke.yaml \
+              -f spire.yaml
+```
+
+#### 4) Check the status of pods
+The spire-control-plane (spire-agent and spire-server) should be Running as well as the cilium-control-plane.
 
 ```
 kubectl get pods -A
