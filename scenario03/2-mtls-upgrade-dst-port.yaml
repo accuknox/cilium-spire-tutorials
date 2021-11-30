@@ -43,20 +43,20 @@ spec:
         http:
         - {}
 ---
-# apiVersion: "cilium.io/v2"
-# kind: CiliumNetworkPolicy
-# metadata:
-#   name: "tls-upgrade-deathstar-dst-03-01"
-# spec:
-#   endpointSelector:
-#     matchLabels:
-#       class: deathstar
-#   ingress:
-#   - toPorts:
-#     - ports:
-#       - port: "80"
-#         protocol: "TCP"
-# ---
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "tls-upgrade-deathstar-dst-03-01"
+spec:
+  endpointSelector:
+    matchLabels:
+      class: deathstar
+  ingress:
+  - toPorts:
+    - ports:
+      - port: "80"
+        protocol: "TCP"
+---
 apiVersion: "cilium.io/v2"
 kind: CiliumNetworkPolicy
 metadata:
@@ -71,4 +71,4 @@ spec:
     - toPorts:
       - ports:
         - port: "53"
-          protocol: UDP 
+          protocol: UDP
