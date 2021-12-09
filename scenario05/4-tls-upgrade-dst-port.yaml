@@ -9,7 +9,7 @@ spec:
   ingress:
   - toPorts:
     - ports:
-      - port: "443"
+      - port: "80"
         protocol: "TCP"
       terminatingTLS:
         spiffe:

@@ -1,1 +1,1 @@
-go build client
+go build -o client
